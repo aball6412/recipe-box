@@ -1,0 +1,37 @@
+
+/*
+THIS IS FOR SASS STYLESHEETS
+FOR LOCAL DEVELOPMENT I'M SIMPLY USING VANILLA CSS
+
+$border: solid
+
+.body
+  border: $border
+
+.add_recipe
+  border: $border
+  
+.recipes
+  border: $border
+ 
+.recipe_item
+  border: $border
+  margin: 10px
+    */
+
+
+body {
+    border: solid;
+}
+
+.add_recipe {
+    border: solid;
+}
+
+.recipes {
+    border: solid;
+}
+
+.recipe_item {
+    border: solid;
+}
