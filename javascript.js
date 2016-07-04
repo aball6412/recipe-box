@@ -11,6 +11,7 @@ class App extends React.Component {
                      { 
                          title: "Omelet",
                          ingredients: ["Bacon", "Eggs", "Cheese", "Vegetables"]
+
                      },
                      {
                          title: "Spaghetti",
@@ -61,7 +62,25 @@ class App extends React.Component {
         
         
           <div className="col-md-6 recipes">
-            <Recipe_list recipes={ this.state.recipes } />
+            <Recipe_list recipes={ this.state.recipes }
+                onEdit={ (id) => {
+                            console.log("I'm going to edit this");
+                            console.log("edit id: " + id);
+                         } //End anon function
+                }  
+                
+                onDelete={ (id) => {
+                            
+                            //Create copy of current state
+                            var newstate = this.state.recipes;
+                            //Remove the element that the user selected from that copy
+                            newstate.splice(id, 1);
+                            
+                            //Set the new array to the recipes key
+                            this.setState({ recipes: newstate });
+                            } //End anon function
+                    
+                } />
           </div>
         
         
@@ -84,14 +103,20 @@ var Recipe_list = function(props) {
  
     var recipes = props.recipes;
     var recipe_list = [];
+    var edit_function = props.onEdit;
+    var delete_function = props.onDelete;
+    
+
     
     for (var i in recipes) {
         
-        recipe_list.push(<Recipe_list_item key={i} recipe={ recipes[i] } />);
+        recipe_list.push(<Recipe_list_item key={i} counter={i} recipe={ recipes[i] } onEdit={ edit_function } onDelete={ delete_function } />);
     }
     
     return (
-        <div>{ recipe_list }</div>
+        <div className="panel-group" id="accordian" role="tablist" aria-multiselectable="true">
+            { recipe_list }
+        </div>
     );
 
     
@@ -105,15 +130,32 @@ var Recipe_list_item = function(props) {
   
   var title = props.recipe.title
   var ingredients = props.recipe.ingredients;
+  var id = props.counter;
+  var heading_id = "heading" + id;
+  var class_id = "collapse" + id;
+  var class_id_href = "#" + class_id;
+  var edit_function = props.onEdit;
+  var delete_function = props.onDelete;
     
-    console.log(props.recipe.ingredients);
-  
   return (
-  
-    <div className="recipe_item">
-      <h3 className="text-center">{ title }</h3> 
+    <div className="panel panel-default">
+        <div className="panel-heading" role="tab" id={ heading_id }>
+              <h3 className="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordian" href={ class_id_href } aria-expanded="false" aria-controls={ class_id }>
+                        { title }
+                    </a>
+              </h3> 
+        </div>
+
+        <div id={ class_id } className="panel-collapse collapse" role="tabpanel" aria-labelledby={ heading_id }>
+            <div className="panel-body">
+                <p>{ ingredients }</p>
+                <button onClick={ () => edit_function(id) } className="btn btn-default" type="button">Edit</button>
+                <button onClick={ () => delete_function(id) } className="btn btn-danger" type="button">Delete</button>
+            </div>
+        </div>
     </div>
-    
+
   );
   
   
