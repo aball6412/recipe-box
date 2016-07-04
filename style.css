@@ -34,4 +34,5 @@ body {
 
 .recipe_item {
     border: solid;
+    margin: 10px;
 }

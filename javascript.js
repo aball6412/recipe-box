@@ -7,15 +7,36 @@ class App extends React.Component {
     super(props);
     
     this.state = {
-      recipe: ""
+        recipes: [
+                     { 
+                         title: "Omelet",
+                         ingredients: ["Bacon", "Eggs", "Cheese", "Vegetables"]
+                     },
+                     {
+                         title: "Spaghetti",
+                         ingredients: ["Noodles", "Meat Sauce", "Cheese"]
+                     }
+                 ]
+        
     } //End state
     
   } //End constructor
   
   
+    
+    get_new_recipe(title, ingredients) {
+        
+        var obj = {
+            title: title,
+            ingredients: ingredients
+        };     
+            
+        this.setState({ recipe: this.state.recipes.push(obj) } );
+    }
+  
   
   render() {
-    
+      
     return (
       
       <div className="row">
@@ -34,13 +55,13 @@ class App extends React.Component {
                     }// End handler
                   } 
                   
-                  type="button" className="btn btn-success">Submit</button>
+                  type="button" className="btn btn-success submit">Submit</button>
               </div>
           </div>
         
         
           <div className="col-md-6 recipes">
-            <Recipe_list />
+            <Recipe_list recipes={ this.state.recipes } />
           </div>
         
         
@@ -48,17 +69,10 @@ class App extends React.Component {
       
       );
     
+  
   } //End render
   
-  get_new_recipe(title, ingredients) {
 
-    console.log(title);
-    console.log(ingredients);
-    
-    this.setState({ recipe: "new one" });
-    console.log("make a new recipe");
-  }
-  
   
   
 }; //End app component
@@ -66,62 +80,45 @@ class App extends React.Component {
 
 
 
-class Recipe_list extends React.Component {
-  
-  constructor(props) {
-    super(props);
-    
-    this.state = {
-        Omelet: ["Bacon", "Eggs", "Cheese", "Vegetables"],
-        Spaghetti: ["Noodles", "Meat Sauce", "Cheese"]
-    } //End state
-    
-
-  } //End constructor
-  
-  get_recipes(state) {
-    var recipes = Object.keys(state);
-    return recipes;
-    
-  }
-  
-  
-  render() {
-    
-    var recipes = this.get_recipes(this.state);
+var Recipe_list = function(props) {
+ 
+    var recipes = props.recipes;
     var recipe_list = [];
     
     for (var i in recipes) {
-      recipe_list.push(<Recipe_list_item recipes={ recipes[i] } />);
+        
+        recipe_list.push(<Recipe_list_item key={i} recipe={ recipes[i] } />);
     }
     
     return (
-  
-      <div>{ recipe_list }</div>
-  
+        <div>{ recipe_list }</div>
     );
+
     
-    
-  } //End render
 
 } //End recipe_list component
 
 
+    
+    
 var Recipe_list_item = function(props) {
   
-  var recipe = props.recipes;
-  
+  var title = props.recipe.title
+  var ingredients = props.recipe.ingredients;
+    
+    console.log(props.recipe.ingredients);
   
   return (
   
-    <div className="recipe_item"><h3 className="text-center">{ recipe }</h3>
-    
+    <div className="recipe_item">
+      <h3 className="text-center">{ title }</h3> 
     </div>
     
   );
   
   
-}
+} //End recipe list item component
+
 
 
 
