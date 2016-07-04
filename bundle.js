@@ -90,18 +90,19 @@
 	        return _this;
 	    } //End constructor
 	
+	    /////////////////////////////////////////////// MAY NOT NEED THIS ////////////////////  
+	    //    get_new_recipe(title, ingredients) {
+	    //       
+	    //        var obj = {
+	    //            title: title,
+	    //            ingredients: ingredients
+	    //        };    
+	    //           
+	    //        this.setState({ recipe: this.state.recipes.push(obj) } );
+	    //    }
+	    /////////////////////////////////////////////////////////////////////////////////////////
+	
 	    _createClass(App, [{
-	        key: "get_new_recipe",
-	        value: function get_new_recipe(title, ingredients) {
-	
-	            var obj = {
-	                title: title,
-	                ingredients: ingredients
-	            };
-	
-	            this.setState({ recipe: this.state.recipes.push(obj) });
-	        }
-	    }, {
 	        key: "render",
 	        value: function render() {
 	            var _this2 = this;
@@ -112,37 +113,35 @@
 	                _react2.default.createElement(
 	                    "div",
 	                    { className: "col-md-5 add_recipe" },
-	                    _react2.default.createElement(
-	                        "div",
-	                        { className: "form-group" },
-	                        _react2.default.createElement("input", { type: "text", className: "form-control rec_title", placeholder: "Recipe Title" }),
-	                        _react2.default.createElement("input", { type: "text", className: "form-control rec_ingredient", placeholder: "Ingredient" }),
-	                        _react2.default.createElement(
-	                            "button",
-	                            { type: "button", className: "btn btn-primary" },
-	                            "Add Ingredient"
-	                        ),
-	                        _react2.default.createElement(
-	                            "button",
-	                            { onClick: function onClick(event) {
-	                                    var title = $(".rec_title").val();
-	                                    var ingredients = $(".rec_ingredient").val();
-	                                    _this2.get_new_recipe(title, ingredients);
-	                                } // End handler
-	                                ,
+	                    _react2.default.createElement(Add_recipe, {
+	                        get_new_recipe: function get_new_recipe(title, ingredients) {
 	
-	                                type: "button", className: "btn btn-success submit" },
-	                            "Submit"
-	                        )
-	                    )
+	                            var obj = {
+	                                title: title,
+	                                ingredients: [ingredients]
+	                            };
+	
+	                            _this2.setState({ recipe: _this2.state.recipes.push(obj) });
+	                        } })
 	                ),
 	                _react2.default.createElement(
 	                    "div",
 	                    { className: "col-md-6 recipes" },
 	                    _react2.default.createElement(Recipe_list, { recipes: this.state.recipes,
 	                        onEdit: function onEdit(id) {
-	                            console.log("I'm going to edit this");
-	                            console.log("edit id: " + id);
+	
+	                            //Put ingredients for this recipe into a list
+	                            var ingredient_list = _this2.state.recipes[id].ingredients;
+	
+	                            //Loop over list and make new input box for each ingredient
+	                            //Populate the input box with ingredient name
+	                            var ingredient_box = "";
+	                            for (var i in ingredient_list) {
+	                                ingredient_box += "<input type='text' class='form-control rec_ingredient' placeholder='Ingredient' value='" + ingredient_list[i] + "' />";
+	                            }
+	
+	                            //Display the input boxes to the client
+	                            $(".ingredients" + id).html("<div class='form-group'>" + ingredient_box + "<button type='button' class='btn btn-primary'>Add Ingredient</button>" + "<button type='button' class='btn btn-success submit'>Submit</button>" + "</div>"); //end .html
 	                        } //End anon function
 	                        ,
 	
@@ -169,6 +168,33 @@
 	
 	; //End app component
 	
+	var Add_recipe = function Add_recipe(props) {
+	
+	    return _react2.default.createElement(
+	        "div",
+	        { className: "form-group" },
+	        _react2.default.createElement("input", { type: "text", className: "form-control rec_title", placeholder: "Recipe Title" }),
+	        _react2.default.createElement("input", { type: "text", className: "form-control rec_ingredient", placeholder: "Ingredient" }),
+	        _react2.default.createElement(
+	            "button",
+	            { type: "button", className: "btn btn-primary" },
+	            "Add Ingredient"
+	        ),
+	        _react2.default.createElement(
+	            "button",
+	            { onClick: function onClick(event) {
+	                    var title = $(".rec_title").val();
+	                    var ingredients = $(".rec_ingredient").val();
+	                    props.get_new_recipe(title, ingredients);
+	                } // End handler
+	                ,
+	
+	                type: "button", className: "btn btn-success submit" },
+	            "Submit"
+	        )
+	    );
+	}; //End add recipe component
+	
 	var Recipe_list = function Recipe_list(props) {
 	
 	    var recipes = props.recipes;
@@ -193,6 +219,7 @@
 	    var title = props.recipe.title;
 	    var ingredients = props.recipe.ingredients;
 	    var id = props.counter;
+	    var custom_id = "panel-body ingredients" + id;
 	    var heading_id = "heading" + id;
 	    var class_id = "collapse" + id;
 	    var class_id_href = "#" + class_id;
@@ -220,7 +247,7 @@
 	            { id: class_id, className: "panel-collapse collapse", role: "tabpanel", "aria-labelledby": heading_id },
 	            _react2.default.createElement(
 	                "div",
-	                { className: "panel-body" },
+	                { className: custom_id },
 	                _react2.default.createElement(
 	                    "p",
 	                    null,

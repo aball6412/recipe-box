@@ -24,17 +24,18 @@ class App extends React.Component {
   } //End constructor
   
   
+ /////////////////////////////////////////////// MAY NOT NEED THIS ////////////////////   
+//    get_new_recipe(title, ingredients) {
+//        
+//        var obj = {
+//            title: title,
+//            ingredients: ingredients
+//        };     
+//            
+//        this.setState({ recipe: this.state.recipes.push(obj) } );
+//    }
+/////////////////////////////////////////////////////////////////////////////////////////
     
-    get_new_recipe(title, ingredients) {
-        
-        var obj = {
-            title: title,
-            ingredients: ingredients
-        };     
-            
-        this.setState({ recipe: this.state.recipes.push(obj) } );
-    }
-  
   
   render() {
       
@@ -44,28 +45,46 @@ class App extends React.Component {
         
         
           <div className="col-md-5 add_recipe">
-              <div className="form-group">
-                <input type="text" className="form-control rec_title" placeholder="Recipe Title" />
-                <input type="text" className="form-control rec_ingredient" placeholder="Ingredient" />
-                <button type="button" className="btn btn-primary">Add Ingredient</button>
-                <button onClick={ 
-                    (event) => {
-                      var title = $(".rec_title").val();
-                      var ingredients = $(".rec_ingredient").val();
-                      this.get_new_recipe(title, ingredients);
-                    }// End handler
-                  } 
-                  
-                  type="button" className="btn btn-success submit">Submit</button>
-              </div>
+            <Add_recipe 
+                get_new_recipe={ (title, ingredients) => {
+        
+                                    var obj = {
+                                        title: title,
+                                        ingredients: [ingredients]
+                                    };     
+
+                                    this.setState({ recipe: this.state.recipes.push(obj) } );
+        
+                                } 
+                } />
           </div>
         
         
           <div className="col-md-6 recipes">
             <Recipe_list recipes={ this.state.recipes }
                 onEdit={ (id) => {
-                            console.log("I'm going to edit this");
-                            console.log("edit id: " + id);
+                            
+                            //Put ingredients for this recipe into a list
+                            var ingredient_list = this.state.recipes[id].ingredients;
+                        
+                            //Loop over list and make new input box for each ingredient
+                            //Populate the input box with ingredient name
+                            var ingredient_box = "";
+                            for (var i in ingredient_list) {
+                                ingredient_box += "<input type='text' class='form-control rec_ingredient' placeholder='Ingredient' value='" + ingredient_list[i] +  "' />";
+                        
+                            }
+                            
+                            //Display the input boxes to the client
+                            $(".ingredients" + id).html(
+                                "<div class='form-group'>" + 
+                                    ingredient_box + 
+                                    "<button type='button' class='btn btn-primary'>Add Ingredient</button>" + 
+
+                                    "<button type='button' class='btn btn-success submit'>Submit</button>" + 
+                                "</div>"
+                            ); //end .html
+
                          } //End anon function
                 }  
                 
@@ -96,6 +115,27 @@ class App extends React.Component {
   
 }; //End app component
 
+
+var Add_recipe = function(props) { 
+    
+    return (
+            <div className="form-group">
+                <input type="text" className="form-control rec_title" placeholder="Recipe Title" />
+                <input type="text" className="form-control rec_ingredient" placeholder="Ingredient" />
+                <button type="button" className="btn btn-primary">Add Ingredient</button>
+                <button onClick={ 
+                    (event) => {
+                      var title = $(".rec_title").val();
+                      var ingredients = $(".rec_ingredient").val();
+                      props.get_new_recipe(title, ingredients);
+                    }// End handler
+                  } 
+
+                  type="button" className="btn btn-success submit">Submit</button>
+            </div>
+    );
+    
+} //End add recipe component
 
 
 
@@ -131,6 +171,7 @@ var Recipe_list_item = function(props) {
   var title = props.recipe.title
   var ingredients = props.recipe.ingredients;
   var id = props.counter;
+  var custom_id = "panel-body ingredients" + id;
   var heading_id = "heading" + id;
   var class_id = "collapse" + id;
   var class_id_href = "#" + class_id;
@@ -148,7 +189,7 @@ var Recipe_list_item = function(props) {
         </div>
 
         <div id={ class_id } className="panel-collapse collapse" role="tabpanel" aria-labelledby={ heading_id }>
-            <div className="panel-body">
+            <div className={ custom_id }>
                 <p>{ ingredients }</p>
                 <button onClick={ () => edit_function(id) } className="btn btn-default" type="button">Edit</button>
                 <button onClick={ () => delete_function(id) } className="btn btn-danger" type="button">Delete</button>
