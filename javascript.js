@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+
 class App extends React.Component {
   
   constructor(props) {
@@ -17,25 +18,15 @@ class App extends React.Component {
                          title: "Spaghetti",
                          ingredients: ["Noodles", "Meat Sauce", "Cheese"]
                      }
-                 ]
+                 ],
+        edit: false,
+        id: false
         
     } //End state
     
+    
   } //End constructor
   
-  
- /////////////////////////////////////////////// MAY NOT NEED THIS ////////////////////   
-//    get_new_recipe(title, ingredients) {
-//        
-//        var obj = {
-//            title: title,
-//            ingredients: ingredients
-//        };     
-//            
-//        this.setState({ recipe: this.state.recipes.push(obj) } );
-//    }
-/////////////////////////////////////////////////////////////////////////////////////////
-    
   
   render() {
       
@@ -63,27 +54,9 @@ class App extends React.Component {
           <div className="col-md-6 recipes">
             <Recipe_list recipes={ this.state.recipes }
                 onEdit={ (id) => {
-                            
-                            //Put ingredients for this recipe into a list
-                            var ingredient_list = this.state.recipes[id].ingredients;
-                        
-                            //Loop over list and make new input box for each ingredient
-                            //Populate the input box with ingredient name
-                            var ingredient_box = "";
-                            for (var i in ingredient_list) {
-                                ingredient_box += "<input type='text' class='form-control rec_ingredient' placeholder='Ingredient' value='" + ingredient_list[i] +  "' />";
-                        
-                            }
-                            
-                            //Display the input boxes to the client
-                            $(".ingredients" + id).html(
-                                "<div class='form-group'>" + 
-                                    ingredient_box + 
-                                    "<button type='button' class='btn btn-primary'>Add Ingredient</button>" + 
-
-                                    "<button type='button' class='btn btn-success submit'>Submit</button>" + 
-                                "</div>"
-                            ); //end .html
+                
+                            this.setState({ edit: true, id: id });
+                
 
                          } //End anon function
                 }  
@@ -99,7 +72,17 @@ class App extends React.Component {
                             this.setState({ recipes: newstate });
                             } //End anon function
                     
-                } />
+                }
+                
+                editRecipe={ (full_recipe_list, new_recipe, id) => {
+                            
+                            full_recipe_list.splice(id, 1, new_recipe);
+
+                            this.setState({ recipes: full_recipe_list, edit: false, id: false });
+                            
+                           }}
+                
+                state={ this.state } />
           </div>
         
         
@@ -145,19 +128,25 @@ var Recipe_list = function(props) {
     var recipe_list = [];
     var edit_function = props.onEdit;
     var delete_function = props.onDelete;
+    var edit_recipe = props.editRecipe;
+    
     
 
     
     for (var i in recipes) {
         
-        recipe_list.push(<Recipe_list_item key={i} counter={i} recipe={ recipes[i] } onEdit={ edit_function } onDelete={ delete_function } />);
+        recipe_list.push(<Recipe_list_item key={i} counter={i} recipe={ recipes[i] } onEdit={ edit_function } onDelete={ delete_function } state={ props.state } full_recipe_list={ recipes } editRecipe={ edit_recipe } />);
     }
     
+
+            
     return (
         <div className="panel-group" id="accordian" role="tablist" aria-multiselectable="true">
             { recipe_list }
         </div>
+
     );
+
 
     
 
@@ -170,6 +159,7 @@ var Recipe_list_item = function(props) {
   
   var title = props.recipe.title
   var ingredients = props.recipe.ingredients;
+  var full_recipe_list = props.full_recipe_list;
   var id = props.counter;
   var custom_id = "panel-body ingredients" + id;
   var heading_id = "heading" + id;
@@ -177,28 +167,82 @@ var Recipe_list_item = function(props) {
   var class_id_href = "#" + class_id;
   var edit_function = props.onEdit;
   var delete_function = props.onDelete;
+  var edit_recipe = props.editRecipe;
     
-  return (
-    <div className="panel panel-default">
-        <div className="panel-heading" role="tab" id={ heading_id }>
-              <h3 className="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordian" href={ class_id_href } aria-expanded="false" aria-controls={ class_id }>
-                        { title }
-                    </a>
-              </h3> 
-        </div>
+    //console.log(props.state.recipes[id].ingredients);
+    
+    
+    //If the state of this id is edit then...
+    if (props.state.id === id) {
+       
 
-        <div id={ class_id } className="panel-collapse collapse" role="tabpanel" aria-labelledby={ heading_id }>
-            <div className={ custom_id }>
-                <p>{ ingredients }</p>
-                <button onClick={ () => edit_function(id) } className="btn btn-default" type="button">Edit</button>
-                <button onClick={ () => delete_function(id) } className="btn btn-danger" type="button">Delete</button>
+        return (
+        
+            <div className="panel panel-default">
+                <div className="panel-heading" role="tab" id={ heading_id }>
+                      <h3 className="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordian" href={ class_id_href } aria-expanded="false" aria-controls={ class_id }>
+                                { title }
+                            </a>
+                      </h3> 
+                </div>
+
+                <div id={ class_id } className="panel-collapse collapse" role="tabpanel" aria-labelledby={ heading_id }>
+                    <div className={ custom_id }>
+                        
+                        <input type="text" className="form-control rec_ingredient_edit" placeholder="Ingredient" defaultValue={ ingredients } />
+            
+                        <button type="button" className="btn btn-primary">Add Ingredient</button>
+                        <button onClick={ () => {
+            
+                                var new_ingredients = $(".rec_ingredient_edit").val();
+
+                                var new_recipe = {
+                                    title: title,
+                                    ingredients: [new_ingredients]
+                                }
+            
+                                edit_recipe(full_recipe_list, new_recipe, id);
+
+                            } }
+                        
+                        type="button" className="btn btn-success submit">Submit</button>
+            
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        
+        
+        );
+       
+    }
+    
+    else {
+        
+          return (
+            <div className="panel panel-default">
+                <div className="panel-heading" role="tab" id={ heading_id }>
+                      <h3 className="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordian" href={ class_id_href } aria-expanded="false" aria-controls={ class_id }>
+                                { title }
+                            </a>
+                      </h3> 
+                </div>
 
-  );
-  
+                <div id={ class_id } className="panel-collapse collapse" role="tabpanel" aria-labelledby={ heading_id }>
+                    <div className={ custom_id }>
+                        <p>{ ingredients }</p>
+                        <button onClick={ () => edit_function(id) } className="btn btn-default" type="button">Edit</button>
+                        <button onClick={ () => delete_function(id) } className="btn btn-danger" type="button">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+
+          );
+
+    }
+
   
 } //End recipe list item component
 

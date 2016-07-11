@@ -83,24 +83,14 @@
 	            }, {
 	                title: "Spaghetti",
 	                ingredients: ["Noodles", "Meat Sauce", "Cheese"]
-	            }]
+	            }],
+	            edit: false,
+	            id: false
 	
 	        }; //End state
 	
 	        return _this;
 	    } //End constructor
-	
-	    /////////////////////////////////////////////// MAY NOT NEED THIS ////////////////////  
-	    //    get_new_recipe(title, ingredients) {
-	    //       
-	    //        var obj = {
-	    //            title: title,
-	    //            ingredients: ingredients
-	    //        };    
-	    //           
-	    //        this.setState({ recipe: this.state.recipes.push(obj) } );
-	    //    }
-	    /////////////////////////////////////////////////////////////////////////////////////////
 	
 	    _createClass(App, [{
 	        key: "render",
@@ -130,18 +120,7 @@
 	                    _react2.default.createElement(Recipe_list, { recipes: this.state.recipes,
 	                        onEdit: function onEdit(id) {
 	
-	                            //Put ingredients for this recipe into a list
-	                            var ingredient_list = _this2.state.recipes[id].ingredients;
-	
-	                            //Loop over list and make new input box for each ingredient
-	                            //Populate the input box with ingredient name
-	                            var ingredient_box = "";
-	                            for (var i in ingredient_list) {
-	                                ingredient_box += "<input type='text' class='form-control rec_ingredient' placeholder='Ingredient' value='" + ingredient_list[i] + "' />";
-	                            }
-	
-	                            //Display the input boxes to the client
-	                            $(".ingredients" + id).html("<div class='form-group'>" + ingredient_box + "<button type='button' class='btn btn-primary'>Add Ingredient</button>" + "<button type='button' class='btn btn-success submit'>Submit</button>" + "</div>"); //end .html
+	                            _this2.setState({ edit: true, id: id });
 	                        } //End anon function
 	                        ,
 	
@@ -156,7 +135,16 @@
 	                            _this2.setState({ recipes: newstate });
 	                        } //End anon function
 	
-	                    })
+	                        ,
+	
+	                        editRecipe: function editRecipe(full_recipe_list, new_recipe, id) {
+	
+	                            full_recipe_list.splice(id, 1, new_recipe);
+	
+	                            _this2.setState({ recipes: full_recipe_list, edit: false, id: false });
+	                        },
+	
+	                        state: this.state })
 	                )
 	            );
 	        } //End render
@@ -201,10 +189,11 @@
 	    var recipe_list = [];
 	    var edit_function = props.onEdit;
 	    var delete_function = props.onDelete;
+	    var edit_recipe = props.editRecipe;
 	
 	    for (var i in recipes) {
 	
-	        recipe_list.push(_react2.default.createElement(Recipe_list_item, { key: i, counter: i, recipe: recipes[i], onEdit: edit_function, onDelete: delete_function }));
+	        recipe_list.push(_react2.default.createElement(Recipe_list_item, { key: i, counter: i, recipe: recipes[i], onEdit: edit_function, onDelete: delete_function, state: props.state, full_recipe_list: recipes, editRecipe: edit_recipe }));
 	    }
 	
 	    return _react2.default.createElement(
@@ -218,6 +207,7 @@
 	
 	    var title = props.recipe.title;
 	    var ingredients = props.recipe.ingredients;
+	    var full_recipe_list = props.full_recipe_list;
 	    var id = props.counter;
 	    var custom_id = "panel-body ingredients" + id;
 	    var heading_id = "heading" + id;
@@ -225,51 +215,108 @@
 	    var class_id_href = "#" + class_id;
 	    var edit_function = props.onEdit;
 	    var delete_function = props.onDelete;
+	    var edit_recipe = props.editRecipe;
 	
-	    return _react2.default.createElement(
-	        "div",
-	        { className: "panel panel-default" },
-	        _react2.default.createElement(
+	    //console.log(props.state.recipes[id].ingredients);
+	
+	    //If the state of this id is edit then...
+	    if (props.state.id === id) {
+	
+	        return _react2.default.createElement(
 	            "div",
-	            { className: "panel-heading", role: "tab", id: heading_id },
-	            _react2.default.createElement(
-	                "h3",
-	                { className: "panel-title" },
-	                _react2.default.createElement(
-	                    "a",
-	                    { role: "button", "data-toggle": "collapse", "data-parent": "#accordian", href: class_id_href, "aria-expanded": "false", "aria-controls": class_id },
-	                    title
-	                )
-	            )
-	        ),
-	        _react2.default.createElement(
-	            "div",
-	            { id: class_id, className: "panel-collapse collapse", role: "tabpanel", "aria-labelledby": heading_id },
+	            { className: "panel panel-default" },
 	            _react2.default.createElement(
 	                "div",
-	                { className: custom_id },
+	                { className: "panel-heading", role: "tab", id: heading_id },
 	                _react2.default.createElement(
-	                    "p",
-	                    null,
-	                    ingredients
-	                ),
+	                    "h3",
+	                    { className: "panel-title" },
+	                    _react2.default.createElement(
+	                        "a",
+	                        { role: "button", "data-toggle": "collapse", "data-parent": "#accordian", href: class_id_href, "aria-expanded": "false", "aria-controls": class_id },
+	                        title
+	                    )
+	                )
+	            ),
+	            _react2.default.createElement(
+	                "div",
+	                { id: class_id, className: "panel-collapse collapse", role: "tabpanel", "aria-labelledby": heading_id },
 	                _react2.default.createElement(
-	                    "button",
-	                    { onClick: function onClick() {
-	                            return edit_function(id);
-	                        }, className: "btn btn-default", type: "button" },
-	                    "Edit"
-	                ),
-	                _react2.default.createElement(
-	                    "button",
-	                    { onClick: function onClick() {
-	                            return delete_function(id);
-	                        }, className: "btn btn-danger", type: "button" },
-	                    "Delete"
+	                    "div",
+	                    { className: custom_id },
+	                    _react2.default.createElement("input", { type: "text", className: "form-control rec_ingredient_edit", placeholder: "Ingredient", defaultValue: ingredients }),
+	                    _react2.default.createElement(
+	                        "button",
+	                        { type: "button", className: "btn btn-primary" },
+	                        "Add Ingredient"
+	                    ),
+	                    _react2.default.createElement(
+	                        "button",
+	                        { onClick: function onClick() {
+	
+	                                var new_ingredients = $(".rec_ingredient_edit").val();
+	
+	                                var new_recipe = {
+	                                    title: title,
+	                                    ingredients: [new_ingredients]
+	                                };
+	
+	                                edit_recipe(full_recipe_list, new_recipe, id);
+	                            },
+	
+	                            type: "button", className: "btn btn-success submit" },
+	                        "Submit"
+	                    )
 	                )
 	            )
-	        )
-	    );
+	        );
+	    } else {
+	
+	        return _react2.default.createElement(
+	            "div",
+	            { className: "panel panel-default" },
+	            _react2.default.createElement(
+	                "div",
+	                { className: "panel-heading", role: "tab", id: heading_id },
+	                _react2.default.createElement(
+	                    "h3",
+	                    { className: "panel-title" },
+	                    _react2.default.createElement(
+	                        "a",
+	                        { role: "button", "data-toggle": "collapse", "data-parent": "#accordian", href: class_id_href, "aria-expanded": "false", "aria-controls": class_id },
+	                        title
+	                    )
+	                )
+	            ),
+	            _react2.default.createElement(
+	                "div",
+	                { id: class_id, className: "panel-collapse collapse", role: "tabpanel", "aria-labelledby": heading_id },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: custom_id },
+	                    _react2.default.createElement(
+	                        "p",
+	                        null,
+	                        ingredients
+	                    ),
+	                    _react2.default.createElement(
+	                        "button",
+	                        { onClick: function onClick() {
+	                                return edit_function(id);
+	                            }, className: "btn btn-default", type: "button" },
+	                        "Edit"
+	                    ),
+	                    _react2.default.createElement(
+	                        "button",
+	                        { onClick: function onClick() {
+	                                return delete_function(id);
+	                            }, className: "btn btn-danger", type: "button" },
+	                        "Delete"
+	                    )
+	                )
+	            )
+	        );
+	    }
 	}; //End recipe list item component
 	
 	_reactDom2.default.render(_react2.default.createElement(App, null), document.querySelector(".app"));
