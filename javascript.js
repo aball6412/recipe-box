@@ -20,7 +20,9 @@ class App extends React.Component {
                      }
                  ],
         edit: false,
-        id: false
+        id: false,
+        ingred_count: 1
+        
         
     } //End state
     
@@ -37,17 +39,26 @@ class App extends React.Component {
         
           <div className="col-md-5 add_recipe">
             <Add_recipe 
-                get_new_recipe={ (title, ingredients) => {
+                get_new_recipe={ (title, ingredient_list) => {
         
                                     var obj = {
                                         title: title,
-                                        ingredients: [ingredients]
+                                        ingredients: ingredient_list
                                     };     
 
                                     this.setState({ recipe: this.state.recipes.push(obj) } );
         
-                                } 
-                } />
+                                } }
+    
+                add_ingredient={ (ingred_count) => {
+                                
+                                    this.setState({ ingred_count: (this.state.ingred_count + 1) });
+                                
+                               } }
+                
+                ingredient_count={ this.state.ingred_count }
+                               
+                               />
           </div>
         
         
@@ -99,18 +110,60 @@ class App extends React.Component {
 }; //End app component
 
 
+
+
+
+
+
+
+
+
+
 var Add_recipe = function(props) { 
+    
+    
+    var ingredient_count = props.ingredient_count;
+    var input_list = [];
+    var ingredient_list = [];
+    
+    for (var i=1; i <= ingredient_count; i++) {
+        
+       input_list.push(<Ingredient_item key={ i } count={ i - 1 } />);
+        
+    }
+                       
+    
     
     return (
             <div className="form-group">
                 <input type="text" className="form-control rec_title" placeholder="Recipe Title" />
-                <input type="text" className="form-control rec_ingredient" placeholder="Ingredient" />
-                <button type="button" className="btn btn-primary">Add Ingredient</button>
+                
+                { input_list }
+                       
+                <button onClick={
+        
+                    (ingredient_count) => {
+                        props.add_ingredient();
+                    }
+        
+        
+                } type="button" className="btn btn-primary">Add Ingredient</button>
+                
                 <button onClick={ 
-                    (event) => {
+                    () => {
+                    
+                    //See how many input boxes there are and loop through each box to get contents
+                    
+                    for (var i = 1; i <= ingredient_count; i++) {
+                        var ingredients = $(".rec_ingredient" + (i - 1)).val();
+                        ingredient_list.push(ingredients)
+                    }
+                
                       var title = $(".rec_title").val();
-                      var ingredients = $(".rec_ingredient").val();
-                      props.get_new_recipe(title, ingredients);
+                    
+                        console.log(ingredient_list);
+                      
+                      props.get_new_recipe(title, ingredient_list);
                     }// End handler
                   } 
 
@@ -122,6 +175,37 @@ var Add_recipe = function(props) {
 
 
 
+
+
+
+
+
+
+var Ingredient_item = function(props) {
+    
+    var count = props.count;
+    var class_id = "form-control rec_ingredient" + count;
+    
+    return (
+    
+        <input type="text" className={ class_id } placeholder="Ingredient" />
+    
+    );
+    
+    
+} //End ingredient item
+
+
+
+
+
+
+
+
+
+
+
+
 var Recipe_list = function(props) {
  
     var recipes = props.recipes;
@@ -129,7 +213,6 @@ var Recipe_list = function(props) {
     var edit_function = props.onEdit;
     var delete_function = props.onDelete;
     var edit_recipe = props.editRecipe;
-    
     
 
     
@@ -169,15 +252,21 @@ var Recipe_list_item = function(props) {
   var delete_function = props.onDelete;
   var edit_recipe = props.editRecipe;
     
-    //console.log(props.state.recipes[id].ingredients);
+  var individual_ingredients = [];
+  
+
+  for (var i in ingredients) {
+            
+            individual_ingredients.push(<Individual_ingredients key={i} ingred_count={ i } counter={ id } ingredient={ ingredients[i] } state={ props.state }/>);
+        }
     
     
     //If the state of this id is edit then...
     if (props.state.id === id) {
        
-
         return (
-        
+            
+            
             <div className="panel panel-default">
                 <div className="panel-heading" role="tab" id={ heading_id }>
                       <h3 className="panel-title">
@@ -190,16 +279,23 @@ var Recipe_list_item = function(props) {
                 <div id={ class_id } className="panel-collapse collapse" role="tabpanel" aria-labelledby={ heading_id }>
                     <div className={ custom_id }>
                         
-                        <input type="text" className="form-control rec_ingredient_edit" placeholder="Ingredient" defaultValue={ ingredients } />
+                        { individual_ingredients }
             
                         <button type="button" className="btn btn-primary">Add Ingredient</button>
                         <button onClick={ () => {
             
-                                var new_ingredients = $(".rec_ingredient_edit").val();
-
+                                var lst = [];
+                                
+                                for (var j=0; j< ingredients.length; j++) {
+                                    var new_ingredients = $(".rec_ingredient_edit" + j).val();
+                                    lst.push(new_ingredients);
+                                }
+                                
+                                console.log(lst);
+            
                                 var new_recipe = {
                                     title: title,
-                                    ingredients: [new_ingredients]
+                                    ingredients: lst
                                 }
             
                                 edit_recipe(full_recipe_list, new_recipe, id);
@@ -219,6 +315,8 @@ var Recipe_list_item = function(props) {
     
     else {
         
+        
+        
           return (
             <div className="panel panel-default">
                 <div className="panel-heading" role="tab" id={ heading_id }>
@@ -231,7 +329,7 @@ var Recipe_list_item = function(props) {
 
                 <div id={ class_id } className="panel-collapse collapse" role="tabpanel" aria-labelledby={ heading_id }>
                     <div className={ custom_id }>
-                        <p>{ ingredients }</p>
+                        { individual_ingredients }
                         <button onClick={ () => edit_function(id) } className="btn btn-default" type="button">Edit</button>
                         <button onClick={ () => delete_function(id) } className="btn btn-danger" type="button">Delete</button>
                     </div>
@@ -247,6 +345,38 @@ var Recipe_list_item = function(props) {
 } //End recipe list item component
 
 
+
+
+var Individual_ingredients = function(props) {
+    
+    var ingredient = props.ingredient;
+    var id = props.counter;
+    
+    var ingred_count = props.ingred_count;
+    var class_id = "form-control rec_ingredient_edit" + ingred_count;
+    
+    
+    
+    ///IF PROPS.EDIT == TRUE IS GOOD ALSO MAKE SURE THAT IT ONLY FIRES FOR THE SELECTED ID AND NOT FOR ALL THE DIFFERENT RECIPES
+    if (props.state.edit === true && props.state.id === id) {
+
+        return (
+        
+            <input type="text" className={ class_id } placeholder="Ingredient" defaultValue={ ingredient } />
+        
+        ); 
+    }
+    
+    
+    else {
+        return (
+
+            <p>{ ingredient }</p>
+        );
+    }
+    
+    
+} //End Individual_ingredients component
 
 
 

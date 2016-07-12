@@ -85,7 +85,8 @@
 	                ingredients: ["Noodles", "Meat Sauce", "Cheese"]
 	            }],
 	            edit: false,
-	            id: false
+	            id: false,
+	            ingred_count: 1
 	
 	        }; //End state
 	
@@ -104,15 +105,24 @@
 	                    "div",
 	                    { className: "col-md-5 add_recipe" },
 	                    _react2.default.createElement(Add_recipe, {
-	                        get_new_recipe: function get_new_recipe(title, ingredients) {
+	                        get_new_recipe: function get_new_recipe(title, ingredient_list) {
 	
 	                            var obj = {
 	                                title: title,
-	                                ingredients: [ingredients]
+	                                ingredients: ingredient_list
 	                            };
 	
 	                            _this2.setState({ recipe: _this2.state.recipes.push(obj) });
-	                        } })
+	                        },
+	
+	                        add_ingredient: function add_ingredient(ingred_count) {
+	
+	                            _this2.setState({ ingred_count: _this2.state.ingred_count + 1 });
+	                        },
+	
+	                        ingredient_count: this.state.ingred_count
+	
+	                    })
 	                ),
 	                _react2.default.createElement(
 	                    "div",
@@ -158,22 +168,43 @@
 	
 	var Add_recipe = function Add_recipe(props) {
 	
+	    var ingredient_count = props.ingredient_count;
+	    var input_list = [];
+	    var ingredient_list = [];
+	
+	    for (var i = 1; i <= ingredient_count; i++) {
+	
+	        input_list.push(_react2.default.createElement(Ingredient_item, { key: i, count: i - 1 }));
+	    }
+	
 	    return _react2.default.createElement(
 	        "div",
 	        { className: "form-group" },
 	        _react2.default.createElement("input", { type: "text", className: "form-control rec_title", placeholder: "Recipe Title" }),
-	        _react2.default.createElement("input", { type: "text", className: "form-control rec_ingredient", placeholder: "Ingredient" }),
+	        input_list,
 	        _react2.default.createElement(
 	            "button",
-	            { type: "button", className: "btn btn-primary" },
+	            { onClick: function onClick(ingredient_count) {
+	                    props.add_ingredient();
+	                }, type: "button", className: "btn btn-primary" },
 	            "Add Ingredient"
 	        ),
 	        _react2.default.createElement(
 	            "button",
-	            { onClick: function onClick(event) {
+	            { onClick: function onClick() {
+	
+	                    //See how many input boxes there are and loop through each box to get contents
+	
+	                    for (var i = 1; i <= ingredient_count; i++) {
+	                        var ingredients = $(".rec_ingredient" + (i - 1)).val();
+	                        ingredient_list.push(ingredients);
+	                    }
+	
 	                    var title = $(".rec_title").val();
-	                    var ingredients = $(".rec_ingredient").val();
-	                    props.get_new_recipe(title, ingredients);
+	
+	                    console.log(ingredient_list);
+	
+	                    props.get_new_recipe(title, ingredient_list);
 	                } // End handler
 	                ,
 	
@@ -182,6 +213,14 @@
 	        )
 	    );
 	}; //End add recipe component
+	
+	var Ingredient_item = function Ingredient_item(props) {
+	
+	    var count = props.count;
+	    var class_id = "form-control rec_ingredient" + count;
+	
+	    return _react2.default.createElement("input", { type: "text", className: class_id, placeholder: "Ingredient" });
+	}; //End ingredient item
 	
 	var Recipe_list = function Recipe_list(props) {
 	
@@ -217,7 +256,12 @@
 	    var delete_function = props.onDelete;
 	    var edit_recipe = props.editRecipe;
 	
-	    //console.log(props.state.recipes[id].ingredients);
+	    var individual_ingredients = [];
+	
+	    for (var i in ingredients) {
+	
+	        individual_ingredients.push(_react2.default.createElement(Individual_ingredients, { key: i, ingred_count: i, counter: id, ingredient: ingredients[i], state: props.state }));
+	    }
 	
 	    //If the state of this id is edit then...
 	    if (props.state.id === id) {
@@ -244,7 +288,7 @@
 	                _react2.default.createElement(
 	                    "div",
 	                    { className: custom_id },
-	                    _react2.default.createElement("input", { type: "text", className: "form-control rec_ingredient_edit", placeholder: "Ingredient", defaultValue: ingredients }),
+	                    individual_ingredients,
 	                    _react2.default.createElement(
 	                        "button",
 	                        { type: "button", className: "btn btn-primary" },
@@ -254,11 +298,18 @@
 	                        "button",
 	                        { onClick: function onClick() {
 	
-	                                var new_ingredients = $(".rec_ingredient_edit").val();
+	                                var lst = [];
+	
+	                                for (var j = 0; j < ingredients.length; j++) {
+	                                    var new_ingredients = $(".rec_ingredient_edit" + j).val();
+	                                    lst.push(new_ingredients);
+	                                }
+	
+	                                console.log(lst);
 	
 	                                var new_recipe = {
 	                                    title: title,
-	                                    ingredients: [new_ingredients]
+	                                    ingredients: lst
 	                                };
 	
 	                                edit_recipe(full_recipe_list, new_recipe, id);
@@ -294,11 +345,7 @@
 	                _react2.default.createElement(
 	                    "div",
 	                    { className: custom_id },
-	                    _react2.default.createElement(
-	                        "p",
-	                        null,
-	                        ingredients
-	                    ),
+	                    individual_ingredients,
 	                    _react2.default.createElement(
 	                        "button",
 	                        { onClick: function onClick() {
@@ -318,6 +365,27 @@
 	        );
 	    }
 	}; //End recipe list item component
+	
+	var Individual_ingredients = function Individual_ingredients(props) {
+	
+	    var ingredient = props.ingredient;
+	    var id = props.counter;
+	
+	    var ingred_count = props.ingred_count;
+	    var class_id = "form-control rec_ingredient_edit" + ingred_count;
+	
+	    ///IF PROPS.EDIT == TRUE IS GOOD ALSO MAKE SURE THAT IT ONLY FIRES FOR THE SELECTED ID AND NOT FOR ALL THE DIFFERENT RECIPES
+	    if (props.state.edit === true && props.state.id === id) {
+	
+	        return _react2.default.createElement("input", { type: "text", className: class_id, placeholder: "Ingredient", defaultValue: ingredient });
+	    } else {
+	        return _react2.default.createElement(
+	            "p",
+	            null,
+	            ingredient
+	        );
+	    }
+	}; //End Individual_ingredients component
 	
 	_reactDom2.default.render(_react2.default.createElement(App, null), document.querySelector(".app"));
 
