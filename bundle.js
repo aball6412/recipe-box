@@ -131,7 +131,7 @@
 	                    _react2.default.createElement(Recipe_list, { recipes: this.state.recipes,
 	                        onEdit: function onEdit(id) {
 	
-	                            _this2.setState({ edit: true, id: id });
+	                            _this2.setState({ edit: true, id: id, edit_ingred_count: 0 });
 	                        } //End anon function
 	                        ,
 	
@@ -264,16 +264,19 @@
 	    var edit_recipe = props.editRecipe;
 	    var edit_ingredient = props.editIngredient;
 	
+	    var ingred_count = 0;
 	    var individual_ingredients = [];
 	
 	    for (var i in ingredients) {
 	
 	        individual_ingredients.push(_react2.default.createElement(Individual_ingredients, { key: i, ingred_count: i, counter: id, ingredient: ingredients[i], state: props.state }));
+	
+	        ingred_count = Number(i);
 	    }
 	
 	    for (var k = 1; k <= props.state.edit_ingred_count; k++) {
 	
-	        individual_ingredients.push(_react2.default.createElement(Individual_ingredients, { blank: true, state: props.state }));
+	        individual_ingredients.push(_react2.default.createElement(Individual_ingredients, { key: "key" + k, additional_ingred: k, blank: true, ingred_count: ingred_count, counter: id, state: props.state }));
 	    }
 	
 	    //If the state of this id is edit then...
@@ -318,7 +321,7 @@
 	
 	                                var lst = [];
 	
-	                                for (var j = 0; j < ingredients.length; j++) {
+	                                for (var j = 0; j < ingredients.length + props.state.edit_ingred_count; j++) {
 	                                    var new_ingredients = $(".rec_ingredient_edit" + j).val();
 	                                    lst.push(new_ingredients);
 	                                }
@@ -386,13 +389,18 @@
 	
 	    var ingredient = props.ingredient;
 	    var id = props.counter;
-	    var additional_ingredients = props.state.edit_ingred_count;
+	    var additional_ingredients = props.additional_ingred;
 	
 	    var ingred_count = props.ingred_count;
 	    var class_id = "form-control rec_ingredient_edit" + ingred_count;
 	    var class_id_blank = "form-control rec_ingredient_edit" + (ingred_count + additional_ingredients);
 	
-	    if (props.blank) {
+	    if (props.blank && props.state.edit === true && props.state.id === id) {
+	
+	        console.log(ingred_count);
+	        console.log(additional_ingredients);
+	
+	        console.log(ingred_count + additional_ingredients);
 	
 	        return _react2.default.createElement("input", { type: "text", className: class_id_blank, placeholder: "Ingredient" });
 	    }

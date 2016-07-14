@@ -67,7 +67,7 @@ class App extends React.Component {
             <Recipe_list recipes={ this.state.recipes }
                 onEdit={ (id) => {
                 
-                            this.setState({ edit: true, id: id });
+                            this.setState({ edit: true, id: id, edit_ingred_count: 0 });
                 
 
                          } //End anon function
@@ -174,6 +174,7 @@ var Add_recipe = function(props) {
                         console.log(ingredient_list);
                       
                       props.get_new_recipe(title, ingredient_list);
+
                     }// End handler
                   } 
 
@@ -264,17 +265,20 @@ var Recipe_list_item = function(props) {
   var edit_recipe = props.editRecipe;
   var edit_ingredient = props.editIngredient;
     
+  var ingred_count = 0;
   var individual_ingredients = [];
   
 
   for (var i in ingredients) {
             
             individual_ingredients.push(<Individual_ingredients key={i} ingred_count={ i } counter={ id } ingredient={ ingredients[i] } state={ props.state }/>);
+                                        
+            ingred_count = Number(i);
         }
                                         
   for (var k=1; k<= props.state.edit_ingred_count; k++) {
                 
-          individual_ingredients.push(<Individual_ingredients blank={ true } state={ props.state } />); 
+          individual_ingredients.push(<Individual_ingredients key={"key" + k} additional_ingred={k} blank={ true } ingred_count={ ingred_count } counter={ id } state={ props.state } />); 
                 
                 
   } 
@@ -316,7 +320,7 @@ var Recipe_list_item = function(props) {
             
                                 var lst = [];
                                 
-                                for (var j=0; j< ingredients.length; j++) {
+                                for (var j=0; j< (ingredients.length + props.state.edit_ingred_count); j++) {
                                     var new_ingredients = $(".rec_ingredient_edit" + j).val();
                                     lst.push(new_ingredients);
                                 }
@@ -380,14 +384,21 @@ var Individual_ingredients = function(props) {
     
     var ingredient = props.ingredient;
     var id = props.counter;
-    var additional_ingredients = props.state.edit_ingred_count;
+    var additional_ingredients = props.additional_ingred;
     
     var ingred_count = props.ingred_count;
     var class_id = "form-control rec_ingredient_edit" + ingred_count;
     var class_id_blank = "form-control rec_ingredient_edit" + (ingred_count + additional_ingredients);
     
     
-    if (props.blank) {
+    
+    
+    if (props.blank && props.state.edit === true && props.state.id === id) {
+        
+        console.log(ingred_count);
+    console.log(additional_ingredients);
+    
+    console.log(ingred_count + additional_ingredients);
         
         return (
         
