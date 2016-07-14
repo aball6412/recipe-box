@@ -86,7 +86,8 @@
 	            }],
 	            edit: false,
 	            id: false,
-	            ingred_count: 1
+	            ingred_count: 1,
+	            edit_ingred_count: 0
 	
 	        }; //End state
 	
@@ -152,6 +153,11 @@
 	                            full_recipe_list.splice(id, 1, new_recipe);
 	
 	                            _this2.setState({ recipes: full_recipe_list, edit: false, id: false });
+	                        },
+	
+	                        editIngredient: function editIngredient() {
+	
+	                            _this2.setState({ edit_ingred_count: _this2.state.edit_ingred_count + 1 });
 	                        },
 	
 	                        state: this.state })
@@ -229,10 +235,11 @@
 	    var edit_function = props.onEdit;
 	    var delete_function = props.onDelete;
 	    var edit_recipe = props.editRecipe;
+	    var edit_ingredient = props.editIngredient;
 	
 	    for (var i in recipes) {
 	
-	        recipe_list.push(_react2.default.createElement(Recipe_list_item, { key: i, counter: i, recipe: recipes[i], onEdit: edit_function, onDelete: delete_function, state: props.state, full_recipe_list: recipes, editRecipe: edit_recipe }));
+	        recipe_list.push(_react2.default.createElement(Recipe_list_item, { key: i, counter: i, recipe: recipes[i], onEdit: edit_function, onDelete: delete_function, state: props.state, full_recipe_list: recipes, editRecipe: edit_recipe, editIngredient: edit_ingredient }));
 	    }
 	
 	    return _react2.default.createElement(
@@ -255,12 +262,18 @@
 	    var edit_function = props.onEdit;
 	    var delete_function = props.onDelete;
 	    var edit_recipe = props.editRecipe;
+	    var edit_ingredient = props.editIngredient;
 	
 	    var individual_ingredients = [];
 	
 	    for (var i in ingredients) {
 	
 	        individual_ingredients.push(_react2.default.createElement(Individual_ingredients, { key: i, ingred_count: i, counter: id, ingredient: ingredients[i], state: props.state }));
+	    }
+	
+	    for (var k = 1; k <= props.state.edit_ingred_count; k++) {
+	
+	        individual_ingredients.push(_react2.default.createElement(Individual_ingredients, { blank: true, state: props.state }));
 	    }
 	
 	    //If the state of this id is edit then...
@@ -291,7 +304,12 @@
 	                    individual_ingredients,
 	                    _react2.default.createElement(
 	                        "button",
-	                        { type: "button", className: "btn btn-primary" },
+	                        { onClick: function onClick() {
+	
+	                                edit_ingredient();
+	                            },
+	
+	                            type: "button", className: "btn btn-primary" },
 	                        "Add Ingredient"
 	                    ),
 	                    _react2.default.createElement(
@@ -304,8 +322,6 @@
 	                                    var new_ingredients = $(".rec_ingredient_edit" + j).val();
 	                                    lst.push(new_ingredients);
 	                                }
-	
-	                                console.log(lst);
 	
 	                                var new_recipe = {
 	                                    title: title,
@@ -370,9 +386,16 @@
 	
 	    var ingredient = props.ingredient;
 	    var id = props.counter;
+	    var additional_ingredients = props.state.edit_ingred_count;
 	
 	    var ingred_count = props.ingred_count;
 	    var class_id = "form-control rec_ingredient_edit" + ingred_count;
+	    var class_id_blank = "form-control rec_ingredient_edit" + (ingred_count + additional_ingredients);
+	
+	    if (props.blank) {
+	
+	        return _react2.default.createElement("input", { type: "text", className: class_id_blank, placeholder: "Ingredient" });
+	    }
 	
 	    ///IF PROPS.EDIT == TRUE IS GOOD ALSO MAKE SURE THAT IT ONLY FIRES FOR THE SELECTED ID AND NOT FOR ALL THE DIFFERENT RECIPES
 	    if (props.state.edit === true && props.state.id === id) {

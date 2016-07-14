@@ -21,7 +21,8 @@ class App extends React.Component {
                  ],
         edit: false,
         id: false,
-        ingred_count: 1
+        ingred_count: 1,
+        edit_ingred_count: 0
         
         
     } //End state
@@ -91,7 +92,16 @@ class App extends React.Component {
 
                             this.setState({ recipes: full_recipe_list, edit: false, id: false });
                             
-                           }}
+                           }
+                }
+                           
+                editIngredient={ () => {
+                                
+                              this.setState({ edit_ingred_count: (this.state.edit_ingred_count + 1)})  
+                            
+                                
+                           }
+                }
                 
                 state={ this.state } />
           </div>
@@ -213,12 +223,13 @@ var Recipe_list = function(props) {
     var edit_function = props.onEdit;
     var delete_function = props.onDelete;
     var edit_recipe = props.editRecipe;
+    var edit_ingredient = props.editIngredient;
     
 
     
     for (var i in recipes) {
         
-        recipe_list.push(<Recipe_list_item key={i} counter={i} recipe={ recipes[i] } onEdit={ edit_function } onDelete={ delete_function } state={ props.state } full_recipe_list={ recipes } editRecipe={ edit_recipe } />);
+        recipe_list.push(<Recipe_list_item key={i} counter={i} recipe={ recipes[i] } onEdit={ edit_function } onDelete={ delete_function } state={ props.state } full_recipe_list={ recipes } editRecipe={ edit_recipe } editIngredient={ edit_ingredient } />);
     }
     
 
@@ -251,6 +262,7 @@ var Recipe_list_item = function(props) {
   var edit_function = props.onEdit;
   var delete_function = props.onDelete;
   var edit_recipe = props.editRecipe;
+  var edit_ingredient = props.editIngredient;
     
   var individual_ingredients = [];
   
@@ -259,6 +271,13 @@ var Recipe_list_item = function(props) {
             
             individual_ingredients.push(<Individual_ingredients key={i} ingred_count={ i } counter={ id } ingredient={ ingredients[i] } state={ props.state }/>);
         }
+                                        
+  for (var k=1; k<= props.state.edit_ingred_count; k++) {
+                
+          individual_ingredients.push(<Individual_ingredients blank={ true } state={ props.state } />); 
+                
+                
+  } 
     
     
     //If the state of this id is edit then...
@@ -281,7 +300,18 @@ var Recipe_list_item = function(props) {
                         
                         { individual_ingredients }
             
-                        <button type="button" className="btn btn-primary">Add Ingredient</button>
+                        <button onClick={ () => {
+            
+            
+                                edit_ingredient();
+            
+            
+                            } }
+      
+                        type="button" className="btn btn-primary">Add Ingredient</button>
+                        
+                        
+                        
                         <button onClick={ () => {
             
                                 var lst = [];
@@ -291,7 +321,6 @@ var Recipe_list_item = function(props) {
                                     lst.push(new_ingredients);
                                 }
                                 
-                                console.log(lst);
             
                                 var new_recipe = {
                                     title: title,
@@ -351,10 +380,22 @@ var Individual_ingredients = function(props) {
     
     var ingredient = props.ingredient;
     var id = props.counter;
+    var additional_ingredients = props.state.edit_ingred_count;
     
     var ingred_count = props.ingred_count;
     var class_id = "form-control rec_ingredient_edit" + ingred_count;
+    var class_id_blank = "form-control rec_ingredient_edit" + (ingred_count + additional_ingredients);
     
+    
+    if (props.blank) {
+        
+        return (
+        
+            <input type="text" className={ class_id_blank } placeholder="Ingredient" />
+        )
+        
+        
+    }
     
     
     ///IF PROPS.EDIT == TRUE IS GOOD ALSO MAKE SURE THAT IT ONLY FIRES FOR THE SELECTED ID AND NOT FOR ALL THE DIFFERENT RECIPES
