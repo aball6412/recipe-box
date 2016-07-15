@@ -108,6 +108,11 @@
 	                    _react2.default.createElement(Add_recipe, {
 	                        get_new_recipe: function get_new_recipe(title, ingredient_list) {
 	
+	                            //Save this.state.recipes to local storage
+	                            localStorage.setItem("recipes", _this2.state.recipes);
+	                            console.log(_this2.state.recipes);
+	                            console.log(localStorage);
+	
 	                            var obj = {
 	                                title: title,
 	                                ingredients: ingredient_list
@@ -149,6 +154,10 @@
 	                        ,
 	
 	                        editRecipe: function editRecipe(full_recipe_list, new_recipe, id) {
+	
+	                            //Save this.state.recipes to local storage
+	                            localStorage.setItem("recipes", _this2.state.recipes);
+	                            console.log(localStorage);
 	
 	                            full_recipe_list.splice(id, 1, new_recipe);
 	
@@ -207,8 +216,6 @@
 	                    }
 	
 	                    var title = $(".rec_title").val();
-	
-	                    console.log(ingredient_list);
 	
 	                    props.get_new_recipe(title, ingredient_list);
 	                } // End handler
@@ -396,11 +403,6 @@
 	    var class_id_blank = "form-control rec_ingredient_edit" + (ingred_count + additional_ingredients);
 	
 	    if (props.blank && props.state.edit === true && props.state.id === id) {
-	
-	        console.log(ingred_count);
-	        console.log(additional_ingredients);
-	
-	        console.log(ingred_count + additional_ingredients);
 	
 	        return _react2.default.createElement("input", { type: "text", className: class_id_blank, placeholder: "Ingredient" });
 	    }

@@ -27,12 +27,14 @@ class App extends React.Component {
         
     } //End state
     
+
     
   } //End constructor
   
   
   render() {
       
+
     return (
       
       <div className="row">
@@ -41,6 +43,11 @@ class App extends React.Component {
           <div className="col-md-5 add_recipe">
             <Add_recipe 
                 get_new_recipe={ (title, ingredient_list) => {
+        
+                                    //Save this.state.recipes to local storage
+                                    localStorage.setItem("recipes", this.state.recipes);
+                                    console.log(this.state.recipes);
+                                    console.log(localStorage);
         
                                     var obj = {
                                         title: title,
@@ -87,6 +94,10 @@ class App extends React.Component {
                 }
                 
                 editRecipe={ (full_recipe_list, new_recipe, id) => {
+                            
+                            //Save this.state.recipes to local storage
+                            localStorage.setItem("recipes", this.state.recipes);
+                            console.log(localStorage);
                             
                             full_recipe_list.splice(id, 1, new_recipe);
 
@@ -170,8 +181,6 @@ var Add_recipe = function(props) {
                     }
                 
                       var title = $(".rec_title").val();
-                    
-                        console.log(ingredient_list);
                       
                       props.get_new_recipe(title, ingredient_list);
 
@@ -394,11 +403,6 @@ var Individual_ingredients = function(props) {
     
     
     if (props.blank && props.state.edit === true && props.state.id === id) {
-        
-        console.log(ingred_count);
-    console.log(additional_ingredients);
-    
-    console.log(ingred_count + additional_ingredients);
         
         return (
         
