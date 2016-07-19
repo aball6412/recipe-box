@@ -67,23 +67,23 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	//Create main App component
+	
 	var App = function (_React$Component) {
 	    _inherits(App, _React$Component);
 	
 	    function App(props) {
 	        _classCallCheck(this, App);
 	
+	        //Get the saved recipe from the local storage
+	
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
 	
-	        _this.state = {
-	            recipes: [{
-	                title: "Omelet",
-	                ingredients: ["Bacon", "Eggs", "Cheese", "Vegetables"]
+	        var saved_recipe = JSON.parse(localStorage.recipes);
 	
-	            }, {
-	                title: "Spaghetti",
-	                ingredients: ["Noodles", "Meat Sauce", "Cheese"]
-	            }],
+	        //Create initial state
+	        _this.state = {
+	            recipes: saved_recipe,
 	            edit: false,
 	            id: false,
 	            ingred_count: 1,
@@ -91,8 +91,25 @@
 	
 	        }; //End state
 	
+	        //RECIPE VALUE PAIR NEEDS TO BE A LIST WITH EACH OBJECT AS A RECIPE EXAMPLE:
+	        //        recipes: [
+	        //                     {
+	        //                         title: "Omelet",
+	        //                         ingredients: ["Bacon", "Eggs", "Cheese", "Vegetables"]
+	        //
+	        //                     },
+	        //                     {
+	        //                         title: "Spaghetti",
+	        //                         ingredients: ["Noodles", "Meat Sauce", "Cheese"]
+	        //                     }
+	        //                 ]
+	        //       
+	
 	        return _this;
 	    } //End constructor
+	
+	    //Render the App
+	
 	
 	    _createClass(App, [{
 	        key: "render",
@@ -108,17 +125,16 @@
 	                    _react2.default.createElement(Add_recipe, {
 	                        get_new_recipe: function get_new_recipe(title, ingredient_list) {
 	
-	                            //Save this.state.recipes to local storage
-	                            localStorage.setItem("recipes", _this2.state.recipes);
-	                            console.log(_this2.state.recipes);
-	                            console.log(localStorage);
-	
 	                            var obj = {
 	                                title: title,
 	                                ingredients: ingredient_list
 	                            };
 	
 	                            _this2.setState({ recipe: _this2.state.recipes.push(obj) });
+	
+	                            //Save this.state.recipes to local storage
+	                            localStorage.setItem("recipes", JSON.stringify(_this2.state.recipes));
+	                            console.log(localStorage);
 	                        },
 	
 	                        add_ingredient: function add_ingredient(ingred_count) {
@@ -149,19 +165,23 @@
 	
 	                            //Set the new array to the recipes key
 	                            _this2.setState({ recipes: newstate });
+	
+	                            //Save this.state.recipes to local storage
+	                            localStorage.setItem("recipes", JSON.stringify(_this2.state.recipes));
+	                            console.log(localStorage);
 	                        } //End anon function
 	
 	                        ,
 	
 	                        editRecipe: function editRecipe(full_recipe_list, new_recipe, id) {
 	
-	                            //Save this.state.recipes to local storage
-	                            localStorage.setItem("recipes", _this2.state.recipes);
-	                            console.log(localStorage);
-	
 	                            full_recipe_list.splice(id, 1, new_recipe);
 	
 	                            _this2.setState({ recipes: full_recipe_list, edit: false, id: false });
+	
+	                            //Save this.state.recipes to local storage
+	                            localStorage.setItem("recipes", JSON.stringify(_this2.state.recipes));
+	                            console.log(localStorage);
 	                        },
 	
 	                        editIngredient: function editIngredient() {
@@ -181,17 +201,21 @@
 	
 	; //End app component
 	
+	//Create the Add Recipe component
 	var Add_recipe = function Add_recipe(props) {
 	
+	    //Get initial variables
 	    var ingredient_count = props.ingredient_count;
 	    var input_list = [];
 	    var ingredient_list = [];
 	
+	    //Find out how many times user clicked "add ingredient" and display that many Ingredient_item components
 	    for (var i = 1; i <= ingredient_count; i++) {
 	
 	        input_list.push(_react2.default.createElement(Ingredient_item, { key: i, count: i - 1 }));
 	    }
 	
+	    //Return the JSX to create the Add_recipe section
 	    return _react2.default.createElement(
 	        "div",
 	        { className: "form-group" },
@@ -209,14 +233,15 @@
 	            { onClick: function onClick() {
 	
 	                    //See how many input boxes there are and loop through each box to get contents
-	
 	                    for (var i = 1; i <= ingredient_count; i++) {
 	                        var ingredients = $(".rec_ingredient" + (i - 1)).val();
 	                        ingredient_list.push(ingredients);
 	                    }
 	
+	                    //Get the recipe title
 	                    var title = $(".rec_title").val();
 	
+	                    //Call function to add the new recipe information
 	                    props.get_new_recipe(title, ingredient_list);
 	                } // End handler
 	                ,
@@ -227,16 +252,20 @@
 	    );
 	}; //End add recipe component
 	
+	//Create component to display new input box for each time user clicks "add ingredient"
 	var Ingredient_item = function Ingredient_item(props) {
 	
+	    //Get needed variables
 	    var count = props.count;
 	    var class_id = "form-control rec_ingredient" + count;
 	
 	    return _react2.default.createElement("input", { type: "text", className: class_id, placeholder: "Ingredient" });
 	}; //End ingredient item
 	
+	//Create recipe list component
 	var Recipe_list = function Recipe_list(props) {
 	
+	    //Get initial variables
 	    var recipes = props.recipes;
 	    var recipe_list = [];
 	    var edit_function = props.onEdit;
@@ -244,6 +273,8 @@
 	    var edit_recipe = props.editRecipe;
 	    var edit_ingredient = props.editIngredient;
 	
+	    //For each recipe get Recipe_list_item component
+	    //Pass all needed variables and functions to Recipe_list_item component
 	    for (var i in recipes) {
 	
 	        recipe_list.push(_react2.default.createElement(Recipe_list_item, { key: i, counter: i, recipe: recipes[i], onEdit: edit_function, onDelete: delete_function, state: props.state, full_recipe_list: recipes, editRecipe: edit_recipe, editIngredient: edit_ingredient }));
@@ -256,8 +287,10 @@
 	    );
 	}; //End recipe_list component
 	
+	//Create Recipe_list_item component
 	var Recipe_list_item = function Recipe_list_item(props) {
 	
+	    //Get ititial variables
 	    var title = props.recipe.title;
 	    var ingredients = props.recipe.ingredients;
 	    var full_recipe_list = props.full_recipe_list;
@@ -274,6 +307,7 @@
 	    var ingred_count = 0;
 	    var individual_ingredients = [];
 	
+	    //For each ingredient in a particular recipe call an Individual_ingredients component
 	    for (var i in ingredients) {
 	
 	        individual_ingredients.push(_react2.default.createElement(Individual_ingredients, { key: i, ingred_count: i, counter: id, ingredient: ingredients[i], state: props.state }));
@@ -286,7 +320,7 @@
 	        individual_ingredients.push(_react2.default.createElement(Individual_ingredients, { key: "key" + k, additional_ingred: k, blank: true, ingred_count: ingred_count, counter: id, state: props.state }));
 	    }
 	
-	    //If the state of this id is edit then...
+	    //If the state of this id is edit then return...
 	    if (props.state.id === id) {
 	
 	        return _react2.default.createElement(
@@ -392,8 +426,10 @@
 	    }
 	}; //End recipe list item component
 	
+	//Create individual_ingredients component
 	var Individual_ingredients = function Individual_ingredients(props) {
 	
+	    //Get initial variables
 	    var ingredient = props.ingredient;
 	    var id = props.counter;
 	    var additional_ingredients = props.additional_ingred;
@@ -420,6 +456,7 @@
 	    }
 	}; //End Individual_ingredients component
 	
+	//Render App component to the DOM
 	_reactDom2.default.render(_react2.default.createElement(App, null), document.querySelector(".app"));
 
 /***/ },
