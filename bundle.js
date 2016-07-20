@@ -67,6 +67,18 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	$(".show_recipe_box").click(function () {
+	
+	    $(".add_recipe").removeClass("hidden");
+	    $(".show_recipe_box").addClass("hidden");
+	});
+	
+	$(".app").on("click", ".add_recipe_submit", function () {
+	
+	    $(".add_recipe").addClass("hidden");
+	    $(".show_recipe_box").removeClass("hidden");
+	});
+	
 	//Create main App component
 	
 	var App = function (_React$Component) {
@@ -121,7 +133,7 @@
 	                { className: "row" },
 	                _react2.default.createElement(
 	                    "div",
-	                    { className: "col-md-5 add_recipe" },
+	                    { className: "col-md-4 col-md-offset-4 add_recipe hidden" },
 	                    _react2.default.createElement(Add_recipe, {
 	                        get_new_recipe: function get_new_recipe(title, ingredient_list) {
 	
@@ -148,7 +160,7 @@
 	                ),
 	                _react2.default.createElement(
 	                    "div",
-	                    { className: "col-md-6 recipes" },
+	                    { className: "col-md-6 col-md-offset-3 recipes" },
 	                    _react2.default.createElement(Recipe_list, { recipes: this.state.recipes,
 	                        onEdit: function onEdit(id) {
 	
@@ -246,7 +258,7 @@
 	                } // End handler
 	                ,
 	
-	                type: "button", className: "btn btn-success submit" },
+	                type: "button", className: "btn btn-success add_recipe_submit submit" },
 	            "Submit"
 	        )
 	    );
@@ -257,7 +269,7 @@
 	
 	    //Get needed variables
 	    var count = props.count;
-	    var class_id = "form-control rec_ingredient" + count;
+	    var class_id = "form-control input_item rec_ingredient" + count;
 	
 	    return _react2.default.createElement("input", { type: "text", className: class_id, placeholder: "Ingredient" });
 	}; //End ingredient item
@@ -450,7 +462,7 @@
 	    } else {
 	        return _react2.default.createElement(
 	            "p",
-	            null,
+	            { className: "plain_ingredient" },
 	            ingredient
 	        );
 	    }

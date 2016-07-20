@@ -2,6 +2,24 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 
+
+$(".show_recipe_box").click(function() {
+  
+  $(".add_recipe").removeClass("hidden");
+  $(".show_recipe_box").addClass("hidden");
+  
+});
+
+
+$(".app").on("click", ".add_recipe_submit", function() {
+  
+  $(".add_recipe").addClass("hidden");
+  $(".show_recipe_box").removeClass("hidden");
+});
+
+
+
+
 //Create main App component
 class App extends React.Component {
   
@@ -49,7 +67,7 @@ class App extends React.Component {
       <div className="row">
         
         
-          <div className="col-md-5 add_recipe">
+          <div className="col-md-4 col-md-offset-4 add_recipe hidden">
 
             <Add_recipe 
                 get_new_recipe={ (title, ingredient_list) => {
@@ -79,7 +97,7 @@ class App extends React.Component {
           </div>
         
         
-          <div className="col-md-6 recipes">
+          <div className="col-md-6 col-md-offset-3 recipes">
               
             <Recipe_list recipes={ this.state.recipes }
                 onEdit={ (id) => {
@@ -204,7 +222,7 @@ var Add_recipe = function(props) {
                     }// End handler
                   } 
 
-                  type="button" className="btn btn-success submit">Submit</button>
+                  type="button" className="btn btn-success add_recipe_submit submit">Submit</button>
             </div>
     );
     
@@ -222,7 +240,7 @@ var Ingredient_item = function(props) {
     
     //Get needed variables
     var count = props.count;
-    var class_id = "form-control rec_ingredient" + count;
+    var class_id = "form-control input_item rec_ingredient" + count;
     
     return (
     
@@ -450,7 +468,7 @@ var Individual_ingredients = function(props) {
     else {
         return (
 
-            <p>{ ingredient }</p>
+            <p className="plain_ingredient">{ ingredient }</p>
         );
     }
     
